@@ -1,0 +1,17 @@
+{
+  "name": "aoc-2023",
+  "version": "1.0.0",
+  "description": "Advent of code 2023",
+  "scripts": {
+    "exec": "bun run"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "bun": "^1.0.17"
+  },
+  "dependencies": {
+    "@rimbu/core": "^1.1.1"
+  }
+}
