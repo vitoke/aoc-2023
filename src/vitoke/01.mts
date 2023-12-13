@@ -55,24 +55,18 @@ const replacements = {
 };
 
 function createReplaceReducer(reversed: boolean) {
-  return Reducer.create<string>(
-    "",
-    (state, nextChar, _, halt) => {
-      const nextState = reversed
-        ? `${nextChar}${state}`
-        : `${state}${nextChar}`;
+  return Reducer.createMono("", (state, nextChar, _, halt) => {
+    const nextState = reversed ? `${nextChar}${state}` : `${state}${nextChar}`;
 
-      for (const key in replacements) {
-        if (reversed ? nextState.startsWith(key) : nextState.endsWith(key)) {
-          halt();
-          return replacements[key];
-        }
+    for (const key in replacements) {
+      if (reversed ? nextState.startsWith(key) : nextState.endsWith(key)) {
+        halt();
+        return replacements[key];
       }
+    }
 
-      return nextState;
-    },
-    (s) => s
-  );
+    return nextState;
+  });
 }
 
 const combinedDigitsStreamPartTwo = Stream.from(inputLines).map((line) => {
