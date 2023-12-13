@@ -11,6 +11,9 @@ Advent of Code 2023 implementations for fun and profit.
 So running puzzle 1 will be:
 `npm run exec src/<user>/01.mts example-inputs/01.txt`
 
+You can put your personal inputs from the aoc site into the `personal-inputs/` folder. Files in this folder will be git ignored, so
+now worries about other people getting hold of your personal inputs.
+
 That's it, have fun!
 
 ## Contributing

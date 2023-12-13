@@ -1,3 +1,4 @@
+import { Reducer, Stream } from "@rimbu/core";
 import fs from "node:fs";
 import { exit } from "process";
 
@@ -43,7 +44,7 @@ const parsedInput: Game[] = input.split("\n").map((line) => {
   return { id: Number(gameId), reveals };
 });
 
-// START ALGORITHM
+// START ALGORITHM PART 1
 
 function isPossibleReveal(bag: Reveal, reveal: Reveal) {
   const { red: bagRed = 0, green: bagGreen = 0, blue: bagBlue = 0 } = bag;
@@ -54,20 +55,45 @@ function isPossibleReveal(bag: Reveal, reveal: Reveal) {
   return result;
 }
 
-function findPossibleGames(bag: Reveal, games: Game[]) {
-  return games.reduce((total, game) => {
-    const allRevealsArePossible = game.reveals.every((reveal) =>
+function possibleGameStream(bag: Reveal, games: Game[]) {
+  const possibleGameStream = Stream.from(games).filter((game) => {
+    const isPossibleGame = game.reveals.every((reveal) =>
       isPossibleReveal(bag, reveal)
     );
 
-    if (allRevealsArePossible) {
-      return total + game.id;
-    }
+    return isPossibleGame;
+  });
 
-    return total;
-  }, 0);
+  return possibleGameStream;
 }
 
-const result = findPossibleGames({ red: 12, green: 13, blue: 14 }, parsedInput);
+const actualBagContents: Reveal = { red: 12, green: 13, blue: 14 };
 
-console.log("sum of ids", result);
+const sumOfPossibleGameIds = possibleGameStream(
+  actualBagContents,
+  parsedInput
+).reduce(Reducer.sum.mapInput((game) => game.id));
+
+console.log("part one", { sumOfPossibleGameIds });
+
+// START ALGORITHM PART 2
+
+function getPowerForGame(game: Game) {
+  const [maxRed, maxGreen, maxBlue] = Stream.from(game.reveals).reduceAll(
+    Reducer.max(0).mapInput<Reveal>((reveal) => reveal.red ?? 0),
+    Reducer.max(0).mapInput<Reveal>((reveal) => reveal.green ?? 0),
+    Reducer.max(0).mapInput<Reveal>((reveal) => reveal.blue ?? 0)
+  );
+
+  return maxRed * maxGreen * maxBlue;
+}
+
+function minimumPowerForGamesStream(games: Game[]) {
+  return Stream.from(games).map(getPowerForGame);
+}
+
+const sumOfMinimumPowerForGames = minimumPowerForGamesStream(
+  parsedInput
+).reduce(Reducer.sum);
+
+console.log("part two", { sumOfMinimumPowerForGames });
