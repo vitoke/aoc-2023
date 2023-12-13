@@ -15,21 +15,25 @@ const input = readFileSync(inputFileLocation).toString();
 
 // PARSE INPUT
 
-const inputLines = Stream.from(input).splitOn("\n");
+const inputLinesStream = Stream.from(input).splitOn("\n");
 
-// START ALGORITHM
+// START ALGORITHM PART 1
 
 function isNumber(value: string) {
   return !Number.isNaN(Number(value));
 }
 
-const calculateSumOfFirstAndLastDigit = Reducer.combineObj({
-  first: Reducer.firstWhere(isNumber, 0).mapOutput(Number),
-  last: Reducer.lastWhere(isNumber, 0).mapOutput(Number),
-}).mapOutput(({ first, last }) => first + last);
+const calculateCombinedFirstAndLastDigits = Reducer.combineObj({
+  first: Reducer.firstWhere(isNumber, "0"),
+  last: Reducer.lastWhere(isNumber, ""),
+}).mapOutput(({ first, last }) => Number(`${first}${last}`));
 
-const sumOfFirstAndLastDigits = inputLines
-  .map((line) => Stream.from(line).reduce(calculateSumOfFirstAndLastDigit))
-  .reduce(Reducer.sum);
+const combinedDigitsStream = inputLinesStream.map((line) =>
+  Stream.from(line).reduce(calculateCombinedFirstAndLastDigits)
+);
 
-console.log({ sumOfFirstAndLastDigits });
+const sumOfCombinedDigits = combinedDigitsStream.reduce(Reducer.sum);
+
+console.log("part one", { sumOfCombinedDigits });
+
+// START ALGORITHM PART 2
