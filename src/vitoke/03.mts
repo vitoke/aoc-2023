@@ -17,10 +17,14 @@ const input = fs.readFileSync(inputFileLocation).toString();
 
 const inputLinesStream = Stream.from(input).splitOn("\n");
 
-// START ALGORITHM
+// START ALGORITHM PART 1
 
 function isNumber(value: string) {
   return !Number.isNaN(Number(value));
+}
+
+interface Container {
+  value: number;
 }
 
 /** A transformer to convert a line (stream of chars) into a tuple container:
@@ -29,10 +33,10 @@ function isNumber(value: string) {
  */
 const numberCoordinatesReducer = Reducer.create<
   string,
-  [number, { value: number }][],
+  [charIndex: number, container: Container][],
   {
-    container: { value: number } | undefined;
-    result: [number, { value: number }][];
+    container?: Container;
+    result: [charIndex: number, container: Container][];
   }
 >(
   { container: undefined, result: [] },
@@ -79,7 +83,7 @@ const symbolCoordinates = inputLinesStream.flatMap((line, lineIndex) => {
   return symbolIndicesStream.map((colIndex) => [lineIndex, colIndex] as const);
 });
 
-const indicesSurroundingIndicesStream = symbolCoordinates.flatMap(
+const indicesSurroundingSymbolsStream = symbolCoordinates.flatMap(
   ([lineIndex, colIndex]) =>
     Stream.range({ start: lineIndex - 1, amount: 3 }).flatMap((line) =>
       Stream.range({ start: colIndex - 1, amount: 3 }).map(
@@ -89,13 +93,17 @@ const indicesSurroundingIndicesStream = symbolCoordinates.flatMap(
 );
 
 const numberContainersWithSymbolHitStream =
-  indicesSurroundingIndicesStream.collect(([line, col], _, skip) => {
-    const value = tabelWithCoordinatesToNumberContainers.get(line, col);
+  indicesSurroundingSymbolsStream.collect(([lineIndex, colIndex], _, skip) => {
+    const value = tabelWithCoordinatesToNumberContainers.get(
+      lineIndex,
+      colIndex
+    );
 
     return value === undefined ? skip : value;
   });
 
 const SimpleHashSet = HashSet.createContext({ eq: Eq.objectIs });
+
 const uniqueNumberContainersSet = SimpleHashSet.from(
   numberContainersWithSymbolHitStream
 );
@@ -105,3 +113,48 @@ const sumOfValues = uniqueNumberContainersSet
   .reduce(Reducer.sum.mapInput((container) => container.value));
 
 console.log({ sumOfValues });
+
+// START ALGORITHM PART 2
+
+const gearCoordinates = inputLinesStream.flatMap((line, lineIndex) => {
+  const gearIndicesStream = Stream.from(line).indicesWhere((ch) => ch === "*");
+
+  return gearIndicesStream.map((colIndex) => [lineIndex, colIndex] as const);
+});
+
+const indicesSurroundingGearsStream = gearCoordinates.map(
+  ([lineIndex, colIndex]) =>
+    Stream.range({ start: lineIndex - 1, amount: 3 }).flatMap((line) =>
+      Stream.range({ start: colIndex - 1, amount: 3 }).map(
+        (col) => [line, col] as const
+      )
+    )
+);
+
+const numberContainersWithGearsHitStream = indicesSurroundingGearsStream.map(
+  (coordinates) => {
+    const valueContainersStream = Stream.from(coordinates).collect(
+      ([lineIndex, colIndex], _, skip) => {
+        const value = tabelWithCoordinatesToNumberContainers.get(
+          lineIndex,
+          colIndex
+        );
+
+        return value === undefined ? skip : value;
+      }
+    );
+
+    const setOfContainers = SimpleHashSet.from(valueContainersStream);
+
+    if (setOfContainers.size === 2) {
+      const [c1, c2] = setOfContainers;
+      return c1.value * c2.value;
+    }
+
+    return 0;
+  }
+);
+
+const sumOfGearNumbers = numberContainersWithGearsHitStream.reduce(Reducer.sum);
+
+console.log({ sumOfGearNumbers });
