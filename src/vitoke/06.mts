@@ -64,7 +64,7 @@ function getMinimumHoldTime(raceTime: number, distanceToBeat: number) {
 function getAmountWaysToBeat(raceTime: number, distanceToBeat: number) {
   const [minTime, maxTime] = getMinimumHoldTime(
     raceTime,
-    distanceToBeat + 0.000001 // ensure result is larger than distance to beat
+    distanceToBeat + Number.EPSILON // ensure result is larger than distance to beat
   );
 
   const amountWaystoBeat = Math.floor(maxTime) - Math.ceil(minTime) + 1;
@@ -79,3 +79,12 @@ const numberWaysToBeatPerRace = Stream.zip(timeData, distanceData).map(
 const productOfWaystoBeat = numberWaysToBeatPerRace.reduce(Reducer.product);
 
 console.log({ productOfWaystoBeat });
+
+// START ALGORITHM PART 2
+
+const part2Time = Number(timesStr.split(":")[1].replace(/ /g, ""));
+const part2Distance = Number(distancesStr.split(":")[1].replace(/ /g, ""));
+
+const part2NumberWaysToBeatRace = getAmountWaysToBeat(part2Time, part2Distance);
+
+console.log({ part2NumberWaysToBeatRace });
