@@ -92,7 +92,6 @@ function findLoop(
   direction = Direction.N,
   count = 0
 ): number | undefined {
-  console.log({ position, direction });
   const [row, column] = position;
 
   const tile = table.get(row, column);
