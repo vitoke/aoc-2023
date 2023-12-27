@@ -15,7 +15,7 @@ const input = readFileSync(inputFileLocation).toString();
 
 // PARSE INPUT
 
-let inputLines = input.split("\n");
+const inputLines = input.split("\n");
 
 const initGalaxyPosStream = Stream.from(inputLines).flatMap((line, row) =>
   Stream.from(line).collect((char, col, skip) =>

@@ -15,7 +15,7 @@ const input = readFileSync(inputFileLocation).toString();
 
 // PARSE INPUT
 
-let inputLines = input.split("\n");
+const inputLines = input.split("\n");
 
 // START ALGORITHM
 

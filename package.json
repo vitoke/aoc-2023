@@ -12,6 +12,6 @@
     "bun": "^1.0.17"
   },
   "dependencies": {
-    "@rimbu/core": "^1.1.1"
+    "@rimbu/core": "1.1.3"
   }
 }

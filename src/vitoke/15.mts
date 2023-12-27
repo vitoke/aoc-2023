@@ -21,7 +21,7 @@ const input = readFileSync(inputFileLocation).toString();
 
 // PARSE INPUT
 
-let inputElements = input.split(",");
+const inputElements = input.split(",");
 
 // START ALGORITHM PART 1
 const hasher: Hasher<string> = {
